@@ -1,149 +1,796 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人主页 · Box布局</title>
-
-    <style>
-        /* 保留原有按钮样式 */
-        .login {
-            background-color: blue;
-            color: white;
-            width: 100px;
-            height: 50px;
-            border-radius: 10px;
-        }
-        .register {
-            background-color: red;
-            color: white;
-            width: 100px;
-            height: 50px;
-            border-radius: 10px;
-        }
-
-        /* 新增：盒子布局样式 */
-        :root {
-            --bg: #f5f7fb;
-            --box-bg: #fff;
-            --border: #e5e9f2;
-            --text: #222;
-            --muted: #666;
-            --primary: #2563eb;
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
-            color: var(--text);
-            background: var(--bg);
-        }
-        .container {
-            max-width: 1000px;
-            margin: 24px auto;
-            padding: 0 16px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 16px;
-        }
-        .box {
-            background: var(--box-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-        }
-        .box h2 { margin: 0 0 12px; font-size: 18px; }
-        .profile {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            grid-column: 1 / -1; /* 头部占满一行 */
-        }
-        .profile img {
-            width: 80px; height: 80px; border-radius: 50%;
-            object-fit: cover; border: 2px solid var(--border);
-        }
-        .profile .name { font-size: 22px; font-weight: 600; }
-        .profile .bio { color: var(--muted); margin-top: 6px; }
-        .actions { display: flex; align-items: center; gap: 12px; }
-        .links a {
-            color: var(--primary); text-decoration: none; margin-right: 12px;
-        }
-        .links a:hover { text-decoration: underline; }
-        ul { padding-left: 18px; margin: 0; }
-        li { margin: 6px 0; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EnglishPals - 英语打卡互助社区</title>
+  <!-- 引入外部资源 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  
+  <!-- 配置Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#FF7D00',
+            success: '#00B42A',
+            warning: '#FF7D00',
+            danger: '#F53F3F',
+            dark: '#1D2129',
+            'gray-light': '#F2F3F5',
+            'gray-medium': '#C9CDD4'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .card-hover {
+        @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+      }
+      .btn-primary {
+        @apply bg-primary text-white px-4 py-2 rounded-lg transition-all duration-300 hover:bg-primary/90 hover:shadow-md active:scale-95;
+      }
+      .btn-secondary {
+        @apply bg-secondary text-white px-4 py-2 rounded-lg transition-all duration-300 hover:bg-secondary/90 hover:shadow-md active:scale-95;
+      }
+      .section-padding {
+        @apply py-16 md:py-24;
+      }
+    }
+  </style>
 </head>
-<body>
-    <header class="box profile">
-        <img src="https://picsum.photos/120" alt="头像">
-        <div>
-            <div class="name">我的名字</div>
-            <div class="bio">前端爱好者，热衷于简洁的盒子布局与交互。</div>
-            <div class="links" style="margin-top:8px;">
-                <a href="#about">关于我</a>
-                <a href="#skills">技能</a>
-                <a href="#projects">项目</a>
-                <a href="#contact">联系</a>
-            </div>
+
+<body class="font-inter text-dark bg-gray-50">
+  <!-- 导航栏 -->
+  <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300 bg-white/95 shadow-sm">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16 md:h-20">
+        <!-- Logo -->
+        <a href="#" class="flex items-center space-x-2">
+          <span class="text-primary text-2xl"><i class="fa fa-language"></i></span>
+          <span class="font-bold text-xl text-primary">EnglishPals</span>
+        </a>
+        
+        <!-- 桌面端导航 -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="#home" class="font-medium hover:text-primary transition-colors">首页</a>
+          <a href="#checkin" class="font-medium hover:text-primary transition-colors">今日打卡</a>
+          <a href="#community" class="font-medium hover:text-primary transition-colors">互助社区</a>
+          <a href="#resources" class="font-medium hover:text-primary transition-colors">学习资源</a>
+          <a href="#ranking" class="font-medium hover:text-primary transition-colors">排行榜</a>
+        </nav>
+        
+        <!-- 用户操作 -->
+        <div class="flex items-center space-x-4">
+          <button class="hidden md:block btn-primary">
+            <i class="fa fa-user-circle mr-1"></i> 登录
+          </button>
+          <!-- 移动端菜单按钮 -->
+          <button id="menu-toggle" class="md:hidden text-dark text-xl">
+            <i class="fa fa-bars"></i>
+          </button>
         </div>
-    </header>
+      </div>
+    </div>
+    
+    <!-- 移动端导航菜单 -->
+    <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
+      <div class="container mx-auto px-4 py-3 space-y-3">
+        <a href="#home" class="block py-2 hover:text-primary transition-colors">首页</a>
+        <a href="#checkin" class="block py-2 hover:text-primary transition-colors">今日打卡</a>
+        <a href="#community" class="block py-2 hover:text-primary transition-colors">互助社区</a>
+        <a href="#resources" class="block py-2 hover:text-primary transition-colors">学习资源</a>
+        <a href="#ranking" class="block py-2 hover:text-primary transition-colors">排行榜</a>
+        <button class="w-full btn-primary">
+          <i class="fa fa-user-circle mr-1"></i> 登录
+        </button>
+      </div>
+    </div>
+  </header>
 
-    <main class="container">
-        <section id="about" class="box">
-            <h2>关于我</h2>
-            <p>你好！这是我的个人主页，采用纯 HTML + CSS 的盒子布局来组织常见信息模块。</p>
-        </section>
+  <main>
+    <!-- 英雄区域 -->
+    <section id="home" class="pt-32 pb-20 md:pt-40 md:pb-32 bg-gradient-to-br from-primary/5 to-primary/10">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 mb-10 md:mb-0">
+            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-tight text-dark mb-4">
+              英语学习，<br>
+              <span class="text-primary">互助打卡</span>更高效
+            </h1>
+            <p class="text-lg text-gray-600 mb-8 max-w-lg">
+              加入我们的英语学习社区，每天打卡，相互监督，共同进步。无论你是初学者还是进阶者，这里都有适合你的学习伙伴。
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <button class="btn-secondary text-lg">
+                <i class="fa fa-rocket mr-2"></i>立即加入
+              </button>
+              <button class="border-2 border-primary text-primary px-6 py-3 rounded-lg transition-all duration-300 hover:bg-primary/5">
+                <i class="fa fa-play-circle mr-2"></i>了解更多
+              </button>
+            </div>
+            <div class="mt-8 flex items-center">
+              <div class="flex -space-x-2">
+                <img src="https://picsum.photos/seed/user1/100" alt="用户头像" class="w-10 h-10 rounded-full border-2 border-white">
+                <img src="https://picsum.photos/seed/user2/100" alt="用户头像" class="w-10 h-10 rounded-full border-2 border-white">
+                <img src="https://picsum.photos/seed/user3/100" alt="用户头像" class="w-10 h-10 rounded-full border-2 border-white">
+                <img src="https://picsum.photos/seed/user4/100" alt="用户头像" class="w-10 h-10 rounded-full border-2 border-white">
+                <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center border-2 border-white text-xs font-medium">
+                  +2k
+                </div>
+              </div>
+              <p class="ml-4 text-gray-600">已有 <span class="text-primary font-semibold">2,358</span> 名学习者加入</p>
+            </div>
+          </div>
+          <div class="md:w-1/2 relative">
+            <div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl transform rotate-1 transition-transform hover:rotate-0 duration-500">
+              <img src="https://picsum.photos/seed/english1/800/600" alt="英语学习" class="w-full h-auto">
+            </div>
+            <div class="absolute top-1/4 -left-4 w-32 h-32 bg-secondary/20 rounded-full filter blur-2xl -z-10"></div>
+            <div class="absolute bottom-1/4 -right-8 w-40 h-40 bg-primary/20 rounded-full filter blur-3xl -z-10"></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <section id="skills" class="box">
-            <h2>技能</h2>
-            <ul>
-                <li>HTML / CSS（盒子模型、Flex/Grid 布局）</li>
-                <li>JavaScript（基础交互与事件处理）</li>
-                <li>简单的页面设计与信息架构</li>
-            </ul>
-        </section>
+    <!-- 打卡区域 -->
+    <section id="checkin" class="section-padding bg-white">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">今日打卡</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">每天坚持一点点，积累带来大改变。完成今日打卡任务，记录你的学习轨迹。</p>
+        </div>
+        
+        <div class="max-w-4xl mx-auto">
+          <div class="bg-gray-light rounded-2xl p-6 md:p-8 shadow-sm">
+            <!-- 打卡进度 -->
+            <div class="mb-8">
+              <div class="flex justify-between mb-2">
+                <span class="font-medium">本周打卡进度</span>
+                <span class="text-primary font-semibold">3/7 天</span>
+              </div>
+              <div class="h-3 bg-white rounded-full overflow-hidden">
+                <div class="h-full bg-primary rounded-full" style="width: 43%"></div>
+              </div>
+              <div class="flex justify-between mt-2 text-xs text-gray-500">
+                <span>周一</span>
+                <span>周二</span>
+                <span>周三</span>
+                <span>周四</span>
+                <span>周五</span>
+                <span>周六</span>
+                <span>周日</span>
+              </div>
+              <div class="flex justify-between mt-1">
+                <span class="text-success"><i class="fa fa-check-circle"></i></span>
+                <span class="text-success"><i class="fa fa-check-circle"></i></span>
+                <span class="text-success"><i class="fa fa-check-circle"></i></span>
+                <span class="text-gray-medium"><i class="fa fa-circle-o"></i></span>
+                <span class="text-gray-medium"><i class="fa fa-circle-o"></i></span>
+                <span class="text-gray-medium"><i class="fa fa-circle-o"></i></span>
+                <span class="text-gray-medium"><i class="fa fa-circle-o"></i></span>
+              </div>
+            </div>
+            
+            <!-- 打卡任务 -->
+            <div class="mb-6">
+              <h3 class="text-xl font-semibold mb-4">选择今日学习任务</h3>
+              
+              <div class="space-y-3">
+                <label class="flex items-start p-4 bg-white rounded-lg border border-gray-medium hover:border-primary transition-colors cursor-pointer">
+                  <input type="radio" name="task" class="mt-1 text-primary">
+                  <div class="ml-3">
+                    <h4 class="font-medium">词汇积累</h4>
+                    <p class="text-sm text-gray-600">背诵20个新单词并复习前一天单词</p>
+                  </div>
+                </label>
+                
+                <label class="flex items-start p-4 bg-white rounded-lg border border-gray-medium hover:border-primary transition-colors cursor-pointer">
+                  <input type="radio" name="task" class="mt-1 text-primary" checked>
+                  <div class="ml-3">
+                    <h4 class="font-medium">阅读训练</h4>
+                    <p class="text-sm text-gray-600">阅读一篇英文短文并完成理解练习</p>
+                  </div>
+                </label>
+                
+                <label class="flex items-start p-4 bg-white rounded-lg border border-gray-medium hover:border-primary transition-colors cursor-pointer">
+                  <input type="radio" name="task" class="mt-1 text-primary">
+                  <div class="ml-3">
+                    <h4 class="font-medium">听力练习</h4>
+                    <p class="text-sm text-gray-600">完成一段5分钟以内的听力理解</p>
+                  </div>
+                </label>
+                
+                <label class="flex items-start p-4 bg-white rounded-lg border border-gray-medium hover:border-primary transition-colors cursor-pointer">
+                  <input type="radio" name="task" class="mt-1 text-primary">
+                  <div class="ml-3">
+                    <h4 class="font-medium">写作练习</h4>
+                    <p class="text-sm text-gray-600">写一篇100词左右的英文小短文</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <!-- 打卡笔记 -->
+            <div class="mb-6">
+              <label class="block mb-2 font-medium">学习笔记（可选）</label>
+              <textarea 
+                class="w-full p-3 border border-gray-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                rows="4"
+                placeholder="记录今天的学习收获或遇到的问题..."
+              ></textarea>
+            </div>
+            
+            <!-- 提交按钮 -->
+            <button class="w-full btn-primary text-lg">
+              <i class="fa fa-check mr-2"></i>完成今日打卡
+            </button>
+          </div>
+          
+          <!-- 学习统计 -->
+          <div class="mt-10 bg-gray-light rounded-2xl p-6 md:p-8 shadow-sm">
+            <h3 class="text-xl font-semibold mb-6">学习统计</h3>
+            <div class="h-64">
+              <canvas id="studyChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <section id="projects" class="box">
-            <h2>项目</h2>
-            <ul>
-                <li><a href="https://www.bilibili.com" target="_blank">B站相关项目/收藏</a></li>
-                <li>Box 布局练习：多模块信息卡片</li>
-                <li>交互小工具：按钮点击与提示</li>
-            </ul>
-        </section>
+    <!-- 互助社区 -->
+    <section id="community" class="section-padding bg-gray-50">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">互助社区</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">在这里提问、分享和交流，找到学习伙伴，一起克服英语学习难题。</p>
+        </div>
+        
+        <!-- 社区功能区 -->
+        <div class="flex flex-col md:flex-row gap-6 mb-10">
+          <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm card-hover">
+            <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center text-primary mb-4">
+              <i class="fa fa-question-circle text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">提问求助</h3>
+            <p class="text-gray-600 mb-4">遇到不懂的问题？在这里提问，社区伙伴会为你解答。</p>
+            <a href="#" class="text-primary font-medium hover:underline">
+              查看问题 <i class="fa fa-arrow-right ml-1"></i>
+            </a>
+          </div>
+          
+          <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm card-hover">
+            <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary mb-4">
+              <i class="fa fa-users text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">寻找学伴</h3>
+            <p class="text-gray-600 mb-4">找到志同道合的学习伙伴，一起打卡，共同进步。</p>
+            <a href="#" class="text-secondary font-medium hover:underline">
+              寻找伙伴 <i class="fa fa-arrow-right ml-1"></i>
+            </a>
+          </div>
+          
+          <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm card-hover">
+            <div class="w-12 h-12 bg-success/10 rounded-lg flex items-center justify-center text-success mb-4">
+              <i class="fa fa-share-alt text-xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">分享经验</h3>
+            <p class="text-gray-600 mb-4">分享你的学习方法和心得，帮助更多人高效学习。</p>
+            <a href="#" class="text-success font-medium hover:underline">
+              发布分享 <i class="fa fa-arrow-right ml-1"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- 最新讨论 -->
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div class="p-6 border-b">
+            <h3 class="text-xl font-semibold">最新讨论</h3>
+          </div>
+          
+          <div class="divide-y">
+            <!-- 讨论项1 -->
+            <div class="p-6 hover:bg-gray-50 transition-colors">
+              <div class="flex justify-between">
+                <div class="flex">
+                  <img src="https://picsum.photos/seed/user5/100" alt="用户头像" class="w-10 h-10 rounded-full">
+                  <div class="ml-4">
+                    <h4 class="font-medium hover:text-primary transition-colors">
+                      <a href="#">如何提高英语口语流利度？</a>
+                    </h4>
+                    <p class="text-sm text-gray-600 mt-1">
+                      总是说得磕磕绊绊，有什么有效的练习方法吗？
+                    </p>
+                    <div class="flex items-center mt-2 text-xs text-gray-500">
+                      <span>李明</span>
+                      <span class="mx-2">·</span>
+                      <span>2小时前</span>
+                      <span class="mx-2">·</span>
+                      <span class="flex items-center"><i class="fa fa-comment-o mr-1"></i> 18</span>
+                      <span class="mx-3 px-2 py-0.5 bg-primary/10 text-primary rounded-full">口语</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 讨论项2 -->
+            <div class="p-6 hover:bg-gray-50 transition-colors">
+              <div class="flex justify-between">
+                <div class="flex">
+                  <img src="https://picsum.photos/seed/user6/100" alt="用户头像" class="w-10 h-10 rounded-full">
+                  <div class="ml-4">
+                    <h4 class="font-medium hover:text-primary transition-colors">
+                      <a href="#">推荐一本适合中级水平的英语阅读书</a>
+                    </h4>
+                    <p class="text-sm text-gray-600 mt-1">
+                      想提高阅读能力，希望是有趣一点的题材，不要太枯燥
+                    </p>
+                    <div class="flex items-center mt-2 text-xs text-gray-500">
+                      <span>张华</span>
+                      <span class="mx-2">·</span>
+                      <span>5小时前</span>
+                      <span class="mx-2">·</span>
+                      <span class="flex items-center"><i class="fa fa-comment-o mr-1"></i> 24</span>
+                      <span class="mx-3 px-2 py-0.5 bg-primary/10 text-primary rounded-full">阅读</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 讨论项3 -->
+            <div class="p-6 hover:bg-gray-50 transition-colors">
+              <div class="flex justify-between">
+                <div class="flex">
+                  <img src="https://picsum.photos/seed/user7/100" alt="用户头像" class="w-10 h-10 rounded-full">
+                  <div class="ml-4">
+                    <h4 class="font-medium hover:text-primary transition-colors">
+                      <a href="#">分享一个背单词的好方法</a>
+                    </h4>
+                    <p class="text-sm text-gray-600 mt-1">
+                      我发现结合例句和场景记忆，比单独背单词效果好很多...
+                    </p>
+                    <div class="flex items-center mt-2 text-xs text-gray-500">
+                      <span>王芳</span>
+                      <span class="mx-2">·</span>
+                      <span>昨天</span>
+                      <span class="mx-2">·</span>
+                      <span class="flex items-center"><i class="fa fa-comment-o mr-1"></i> 36</span>
+                      <span class="mx-3 px-2 py-0.5 bg-primary/10 text-primary rounded-full">词汇</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="p-6 text-center">
+            <button class="border border-primary text-primary px-6 py-2 rounded-lg transition-all duration-300 hover:bg-primary/5">
+              查看更多讨论
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <aside class="box actions">
-            <h2>快速操作</h2>
-            <button class="login">登录</button>
-            <button class="register">注册</button>
-        </aside>
+    <!-- 学习资源 -->
+    <section id="resources" class="section-padding bg-white">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">学习资源</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">精选优质英语学习资源，涵盖词汇、语法、听说读写各个方面。</p>
+        </div>
+        
+        <!-- 资源分类 -->
+        <div class="flex flex-wrap justify-center gap-4 mb-10">
+          <button class="px-5 py-2 bg-primary text-white rounded-full text-sm">全部资源</button>
+          <button class="px-5 py-2 bg-gray-light hover:bg-gray-200 rounded-full text-sm transition-colors">词汇</button>
+          <button class="px-5 py-2 bg-gray-light hover:bg-gray-200 rounded-full text-sm transition-colors">语法</button>
+          <button class="px-5 py-2 bg-gray-light hover:bg-gray-200 rounded-full text-sm transition-colors">听力</button>
+          <button class="px-5 py-2 bg-gray-light hover:bg-gray-200 rounded-full text-sm transition-colors">口语</button>
+          <button class="px-5 py-2 bg-gray-light hover:bg-gray-200 rounded-full text-sm transition-colors">阅读</button>
+          <button class="px-5 py-2 bg-gray-light hover:bg-gray-200 rounded-full text-sm transition-colors">写作</button>
+        </div>
+        
+        <!-- 资源列表 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- 资源卡片1 -->
+          <div class="bg-gray-light rounded-xl overflow-hidden shadow-sm card-hover">
+            <div class="h-48 overflow-hidden">
+              <img src="https://picsum.photos/seed/english2/600/400" alt="英语听力资源" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+            </div>
+            <div class="p-5">
+              <div class="flex items-center text-xs text-gray-500 mb-2">
+                <span class="px-2 py-0.5 bg-primary/10 text-primary rounded-full">听力</span>
+                <span class="ml-auto">初级</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2">每日英语听力精选</h3>
+              <p class="text-gray-600 text-sm mb-4">精选日常对话和短文听力材料，适合初学者练习。</p>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500"><i class="fa fa-download mr-1"></i> 1.2k</span>
+                <button class="text-primary hover:text-primary/80 transition-colors">
+                  <i class="fa fa-bookmark-o"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 资源卡片2 -->
+          <div class="bg-gray-light rounded-xl overflow-hidden shadow-sm card-hover">
+            <div class="h-48 overflow-hidden">
+              <img src="https://picsum.photos/seed/english3/600/400" alt="英语词汇资源" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+            </div>
+            <div class="p-5">
+              <div class="flex items-center text-xs text-gray-500 mb-2">
+                <span class="px-2 py-0.5 bg-primary/10 text-primary rounded-full">词汇</span>
+                <span class="ml-auto">中级</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2">词根词缀记忆法</h3>
+              <p class="text-gray-600 text-sm mb-4">通过词根词缀系统记忆单词，提高记忆效率和词汇量。</p>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500"><i class="fa fa-download mr-1"></i> 3.5k</span>
+                <button class="text-primary hover:text-primary/80 transition-colors">
+                  <i class="fa fa-bookmark"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 资源卡片3 -->
+          <div class="bg-gray-light rounded-xl overflow-hidden shadow-sm card-hover">
+            <div class="h-48 overflow-hidden">
+              <img src="https://picsum.photos/seed/english4/600/400" alt="英语阅读资源" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110">
+            </div>
+            <div class="p-5">
+              <div class="flex items-center text-xs text-gray-500 mb-2">
+                <span class="px-2 py-0.5 bg-primary/10 text-primary rounded-full">阅读</span>
+                <span class="ml-auto">中高级</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2">经济学人精选文章</h3>
+              <p class="text-gray-600 text-sm mb-4">精选经济学人文章，附详细注释和阅读练习。</p>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500"><i class="fa fa-download mr-1"></i> 2.8k</span>
+                <button class="text-primary hover:text-primary/80 transition-colors">
+                  <i class="fa fa-bookmark-o"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-10 text-center">
+          <button class="btn-primary">
+            <i class="fa fa-th-list mr-2"></i>查看全部资源
+          </button>
+        </div>
+      </div>
+    </section>
 
-        <section id="contact" class="box">
-            <h2>联系我</h2>
-            <p>邮箱：example@domain.com</p>
-            <p>微信：example_id</p>
-        </section>
-    </main>
+    <!-- 排行榜 -->
+    <section id="ranking" class="section-padding bg-gradient-to-br from-primary/5 to-primary/10">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-4">学习排行榜</h2>
+          <p class="text-gray-600 max-w-2xl mx-auto">看看谁是最勤奋的学习者，加入竞争，激发你的学习动力。</p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- 总排行榜 -->
+          <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div class="p-6 border-b flex justify-between items-center">
+              <h3 class="text-xl font-semibold">总排行榜</h3>
+              <div class="flex space-x-2">
+                <button class="px-4 py-1 bg-primary text-white rounded-lg text-sm">周榜</button>
+                <button class="px-4 py-1 bg-gray-light hover:bg-gray-200 rounded-lg text-sm transition-colors">月榜</button>
+                <button class="px-4 py-1 bg-gray-light hover:bg-gray-200 rounded-lg text-sm transition-colors">总榜</button>
+              </div>
+            </div>
+            
+            <div class="divide-y">
+              <!-- 榜首 -->
+              <div class="p-6 flex items-center bg-yellow-50">
+                <div class="w-10 h-10 rounded-full bg-yellow-400 text-white flex items-center justify-center font-bold">1</div>
+                <img src="https://picsum.photos/seed/top1/100" alt="第一名" class="w-12 h-12 rounded-full mx-4 border-2 border-yellow-400">
+                <div class="flex-1">
+                  <h4 class="font-semibold">陈明亮</h4>
+                  <p class="text-sm text-gray-600">连续打卡 42 天</p>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold text-yellow-500">1250 积分</div>
+                  <div class="text-xs text-gray-500">词汇大师</div>
+                </div>
+              </div>
+              
+              <!-- 第二名 -->
+              <div class="p-6 flex items-center bg-gray-50">
+                <div class="w-10 h-10 rounded-full bg-gray-300 text-white flex items-center justify-center font-bold">2</div>
+                <img src="https://picsum.photos/seed/top2/100" alt="第二名" class="w-12 h-12 rounded-full mx-4 border-2 border-gray-300">
+                <div class="flex-1">
+                  <h4 class="font-semibold">林小雨</h4>
+                  <p class="text-sm text-gray-600">连续打卡 36 天</p>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold text-gray-500">1180 积分</div>
+                  <div class="text-xs text-gray-500">阅读达人</div>
+                </div>
+              </div>
+              
+              <!-- 第三名 -->
+              <div class="p-6 flex items-center bg-gray-50">
+                <div class="w-10 h-10 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold">3</div>
+                <img src="https://picsum.photos/seed/top3/100" alt="第三名" class="w-12 h-12 rounded-full mx-4 border-2 border-amber-600">
+                <div class="flex-1">
+                  <h4 class="font-semibold">王大力</h4>
+                  <p class="text-sm text-gray-600">连续打卡 30 天</p>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold text-amber-600">1050 积分</div>
+                  <div class="text-xs text-gray-500">听力能手</div>
+                </div>
+              </div>
+              
+              <!-- 第四名 -->
+              <div class="p-6 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-bold">4</div>
+                <img src="https://picsum.photos/seed/top4/100" alt="第四名" class="w-12 h-12 rounded-full mx-4">
+                <div class="flex-1">
+                  <h4 class="font-semibold">张婷婷</h4>
+                  <p class="text-sm text-gray-600">连续打卡 28 天</p>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold">980 积分</div>
+                  <div class="text-xs text-gray-500">口语达人</div>
+                </div>
+              </div>
+              
+              <!-- 第五名 -->
+              <div class="p-6 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-bold">5</div>
+                <img src="https://picsum.photos/seed/top5/100" alt="第五名" class="w-12 h-12 rounded-full mx-4">
+                <div class="flex-1">
+                  <h4 class="font-semibold">刘阳</h4>
+                  <p class="text-sm text-gray-600">连续打卡 25 天</p>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold">920 积分</div>
+                  <div class="text-xs text-gray-500">全能选手</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="p-6 text-center">
+              <button class="border border-primary text-primary px-6 py-2 rounded-lg transition-all duration-300 hover:bg-primary/5">
+                查看完整排名
+              </button>
+            </div>
+          </div>
+          
+          <!-- 我的排名 -->
+          <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div class="p-6 border-b">
+              <h3 class="text-xl font-semibold">我的排名</h3>
+            </div>
+            
+            <div class="p-6">
+              <div class="flex flex-col items-center">
+                <div class="relative mb-4">
+                  <img src="https://picsum.photos/seed/current/100" alt="我的头像" class="w-24 h-24 rounded-full border-4 border-primary">
+                  <div class="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+                    28
+                  </div>
+                </div>
+                <h4 class="text-xl font-bold mb-1">你的名字</h4>
+                <p class="text-gray-600 mb-4">连续打卡 7 天</p>
+                
+                <div class="w-full bg-gray-light rounded-full h-2 mb-6">
+                  <div class="bg-primary h-full rounded-full" style="width: 35%"></div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 w-full mb-6">
+                  <div class="bg-gray-light rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-primary">350</div>
+                    <div class="text-sm text-gray-600">总积分</div>
+                  </div>
+                  <div class="bg-gray-light rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-secondary">12</div>
+                    <div class="text-sm text-gray-600">已打卡天数</div>
+                  </div>
+                </div>
+                
+                <button class="w-full btn-secondary">
+                  <i class="fa fa-trophy mr-2"></i>提升排名
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <footer class="box" style="max-width:1000px;margin:0 auto 24px; padding:12px 16px;">
-        © 2025 我的个人主页
-    </footer>
+    <!-- 加入社区 -->
+    <section class="py-20 bg-primary text-white">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold mb-6">加入我们，一起学好英语</h2>
+        <p class="text-white/80 max-w-2xl mx-auto mb-8 text-lg">
+          每天进步一点点，坚持带来大改变。加入我们的英语打卡互助社区，找到学习伙伴，共同成长。
+        </p>
+        <button class="bg-white text-primary font-medium px-8 py-3 rounded-lg text-lg transition-all duration-300 hover:bg-gray-100 hover:shadow-lg active:scale-95">
+          <i class="fa fa-user-plus mr-2"></i>免费注册
+        </button>
+      </div>
+    </section>
+  </main>
 
-<a href="https://www.bilibili.com">
-    点击跳转
-</a>
+  <!-- 页脚 -->
+  <footer class="bg-dark text-white/70 pt-16 pb-8">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-10">
+        <div>
+          <div class="flex items-center space-x-2 mb-6">
+            <span class="text-white text-2xl"><i class="fa fa-language"></i></span>
+            <span class="font-bold text-xl text-white">EnglishPals</span>
+          </div>
+          <p class="mb-6">
+            英语打卡互助社区，让学习不再孤单，让进步更加高效。
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+              <i class="fa fa-weixin"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+              <i class="fa fa-weibo"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+              <i class="fa fa-instagram"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
+              <i class="fa fa-twitter"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-white font-semibold text-lg mb-6">快速链接</h4>
+          <ul class="space-y-3">
+            <li><a href="#home" class="hover:text-white transition-colors">首页</a></li>
+            <li><a href="#checkin" class="hover:text-white transition-colors">今日打卡</a></li>
+            <li><a href="#community" class="hover:text-white transition-colors">互助社区</a></li>
+            <li><a href="#resources" class="hover:text-white transition-colors">学习资源</a></li>
+            <li><a href="#ranking" class="hover:text-white transition-colors">排行榜</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-white font-semibold text-lg mb-6">学习资源</h4>
+          <ul class="space-y-3">
+            <li><a href="#" class="hover:text-white transition-colors">词汇学习</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">语法讲解</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">听力材料</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">阅读精选</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">口语练习</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-white font-semibold text-lg mb-6">联系我们</h4>
+          <ul class="space-y-3">
+            <li class="flex items-start">
+              <i class="fa fa-envelope-o mt-1 mr-3"></i>
+              <span>contact@englishpals.com</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fa fa-phone mt-1 mr-3"></i>
+              <span>400-123-4567</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fa fa-map-marker mt-1 mr-3"></i>
+              <span>北京市海淀区中关村大街1号</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-white/10 pt-8 text-center text-sm">
+        <p>&copy; 2023 EnglishPals 英语打卡互助社区. 保留所有权利.</p>
+      </div>
+    </div>
+  </footer>
 
-
-</body>
-<script>
-    console.log('hello');
-
-    let loginButton = document.querySelector('.login');
-    loginButton.addEventListener('click', function() {
-        alert('登录成功');
+  <!-- JavaScript -->
+  <script>
+    // 移动端菜单切换
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
     });
-</script>
+    
+    // 导航栏滚动效果
+    const navbar = document.getElementById('navbar');
+    
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        navbar.classList.add('shadow-md');
+        navbar.classList.remove('bg-white/95');
+        navbar.classList.add('bg-white');
+      } else {
+        navbar.classList.remove('shadow-md');
+        navbar.classList.add('bg-white/95');
+        navbar.classList.remove('bg-white');
+      }
+    });
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+          
+          // 关闭移动菜单（如果打开）
+          if (!mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.add('hidden');
+          }
+        }
+      });
+    });
+    
+    // 学习统计图表
+    const ctx = document.getElementById('studyChart').getContext('2d');
+    const studyChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+        datasets: [{
+          label: '学习时长（分钟）',
+          data: [30, 45, 60, 35, 50, 75, 0],
+          backgroundColor: 'rgba(22, 93, 255, 0.1)',
+          borderColor: 'rgba(22, 93, 255, 1)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
 </body>
 </html>
